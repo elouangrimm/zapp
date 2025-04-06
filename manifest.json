@@ -1,47 +1,43 @@
 {
-	"update_url": "https://clients2.google.com/service/update2/crx",
-  
+	"manifest_version": 3,
 	"name": "Zapp",
 	"version": "3.1.5",
-	"manifest_version": 3,
 	"description": "Remove annoying elements with a single click",
 	"icons": {
-	  "128": "icons/icon_128.png",
+	  "16": "icons/action_inactive.png",
 	  "48": "icons/icon_48.png",
-	  "16": "icons/action_inactive.png"
+	  "128": "icons/icon_128.png"
+	},
+	"permissions": [
+	  "scripting",
+	  "tabs",
+	  "storage",
+	  "commands"
+	],
+	"host_permissions": [
+	  "*://*/*"
+	],
+	"background": {
+	  "service_worker": "background.js"
 	},
 	"action": {
-	  "default_icon": "icons/action_inactive.png"
+	  "default_icon": "icons/action_inactive.png",
+	  "default_title": "Zapp"
 	},
 	"commands": {
 	  "_execute_action": {
 		"suggested_key": {
-		  "windows": "Ctrl+Shift+X",
-		  "mac": "Command+Shift+X",
-		  "chromeos": "Ctrl+Shift+X",
-		  "linux": "Ctrl+Shift+X"
-		}
+		  "default": "Ctrl+Shift+X",
+		  "mac": "Command+Shift+X"
+		},
+		"description": "Toggle Zapp Element Remover"
 	  }
 	},
-	"background": { "service_worker": "background.js" },
-	"content_scripts": [ {
-	  "all_frames": false,
-	  "js": [ "ctre_content.js" ],
-	  "matches": [ "*://*/*" ],
-	  "run_at": "document_end"
-	} ],
-	"permissions": [
-	  "commands",
-	  "scripting",
-	  "tabs"
+	"web_accessible_resources": [
+	  {
+		"resources": [ "content.css" ],
+		"matches": [ "*://*/*" ]
+	  }
 	],
-
-	"host_permissions": [
-	  "*://*/*"
-	],
-	"web_accessible_resources": [{
-	  "resources": [ "content.css" ],
-	  "matches": [ "*://*/*" ]
-	}],
 	"incognito": "spanning"
   }
