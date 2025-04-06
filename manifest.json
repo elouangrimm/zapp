@@ -31,8 +31,11 @@
 		"run_at": "document_end"
 	} ],
 	"permissions": [
-		"commands", "scripting"
-	],
+		"commands",
+		"scripting",
+		"tabs",
+		"permissions"
+  	],
 	"host_permissions": [
 		"*://*/*"
 	],
