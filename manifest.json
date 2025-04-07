@@ -1,43 +1,47 @@
 {
-	"manifest_version": 3,
-	"name": "Zapp",
-	"version": "3.1.5",
-	"description": "Remove annoying elements with a single click",
-	"icons": {
-	  "16": "icons/action_inactive.png",
-	  "48": "icons/icon_48.png",
-	  "128": "icons/icon_128.png"
-	},
-	"permissions": [
-	  "scripting",
-	  "tabs",
-	  "storage",
-	  "commands"
-	],
-	"host_permissions": [
-	  "*://*/*"
-	],
-	"background": {
-	  "service_worker": "background.js"
-	},
-	"action": {
-	  "default_icon": "icons/action_inactive.png",
-	  "default_title": "Zapp"
-	},
-	"commands": {
-	  "_execute_action": {
-		"suggested_key": {
-		  "default": "Ctrl+Shift+X",
-		  "mac": "Command+Shift+X"
-		},
-		"description": "Toggle Zapp Element Remover"
-	  }
-	},
-	"web_accessible_resources": [
-	  {
-		"resources": [ "content.css" ],
-		"matches": [ "*://*/*" ]
-	  }
-	],
-	"incognito": "spanning"
-  }
+    "manifest_version": 3,
+    "name": "Zapp",
+    "version": "3.1.5",
+    "description": "Remove annoying elements with a single click",
+    "icons": {
+        "16": "./icons/action_inactive.png",
+        "48": "./icons/icon_48.png",
+        "128": "./icons/icon_128.png"
+    },
+    "permissions": [
+        "scripting",
+        "tabs",
+        "storage",
+        "commands"
+    ],
+    "host_permissions": [
+        "*://*/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_icon": "./icons/action_inactive.png",
+        "default_title": "Click to remove element"
+    },
+    "commands": {
+        "_execute_action": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+X",
+                "mac": "Command+Shift+X"
+            },
+            "description": "Toggle Zapp Element Remover"
+        }
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "content.css"
+            ],
+            "matches": [
+                "*://*/*"
+            ]
+        }
+    ],
+    "incognito": "spanning"
+}

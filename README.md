@@ -1,4 +1,5 @@
 # zapp
-A Chrome extension to remove deleted elements.
 
-FOrked from Click To Remove Element.
+A Chrome extension to remove deleted elements, in a stuningly half finished Material You theme.
+
+Forked from Click To Remove Element.
