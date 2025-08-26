@@ -1099,19 +1099,6 @@
 
         saveSettings: function () {
             try {
-                const settingsToSave = {
-                    remember: !!ctre.settings.remember,
-                };
-                chrome.runtime.sendMessage({
-                    action: "set_settings",
-                    data: JSON.stringify(settingsToSave),
-                });
-            } catch (e) {
-                console.error("CTRE: Error sending settings:", e.message);
-            }
-        },
-        saveSettings: function () {
-            try {
                 chrome.runtime.sendMessage({
                     action: "set_settings",
                     data: JSON.stringify(ctre.settings),
@@ -1226,10 +1213,77 @@
                         let isDragging = false,
                             offsetX = 0,
                             offsetY = 0;
+
+                        let isSnapped = { top: false, right: false, bottom: false, left: false };
+                        const SNAP_DISTANCE = 20;
+                        const SNAP_FORCE = 30;
+                        let baseRadius = '3px';
+
                         const onHeaderMove = (e) => {
                             if (!isDragging) return;
-                            host.style.left = e.clientX - offsetX + "px";
-                            host.style.top = e.clientY - offsetY + "px";
+
+                            let newX = e.clientX - offsetX;
+                            let newY = e.clientY - offsetY;
+
+                            const rect = host.getBoundingClientRect();
+                            const winWidth = window.innerWidth;
+                            const winHeight = window.innerHeight;
+
+                            // Left edge
+                            if (isSnapped.left) {
+                                if (newX > SNAP_FORCE) {
+                                    isSnapped.left = false;
+                                } else {
+                                    newX = 0;
+                                }
+                            } else if (newX < SNAP_DISTANCE) {
+                                isSnapped.left = true;
+                                newX = 0;
+                            }
+
+                            // Right edge
+                            if (isSnapped.right) {
+                                if (newX + rect.width < winWidth - SNAP_FORCE) {
+                                    isSnapped.right = false;
+                                } else {
+                                    newX = winWidth - rect.width;
+                                }
+                            } else if (newX + rect.width > winWidth - SNAP_DISTANCE) {
+                                isSnapped.right = true;
+                                newX = winWidth - rect.width;
+                            }
+
+                            // Top edge
+                            if (isSnapped.top) {
+                                if (newY > SNAP_FORCE) {
+                                    isSnapped.top = false;
+                                } else {
+                                    newY = 0;
+                                }
+                            } else if (newY < SNAP_DISTANCE) {
+                                isSnapped.top = true;
+                                newY = 0;
+                            }
+
+                            // Bottom edge
+                            if (isSnapped.bottom) {
+                                if (newY + rect.height < winHeight - SNAP_FORCE) {
+                                    isSnapped.bottom = false;
+                                } else {
+                                    newY = winHeight - rect.height;
+                                }
+                            } else if (newY + rect.height > winHeight - SNAP_DISTANCE) {
+                                isSnapped.bottom = true;
+                                newY = winHeight - rect.height;
+                            }
+
+                            host.style.left = newX + "px";
+                            host.style.top = newY + "px";
+
+                            host.style.borderTopLeftRadius = (isSnapped.top || isSnapped.left) ? '0px' : baseRadius;
+                            host.style.borderTopRightRadius = (isSnapped.top || isSnapped.right) ? '0px' : baseRadius;
+                            host.style.borderBottomLeftRadius = (isSnapped.bottom || isSnapped.left) ? '0px' : baseRadius;
+                            host.style.borderBottomRightRadius = (isSnapped.bottom || isSnapped.right) ? '0px' : baseRadius;
                         };
                         const onHeaderUp = () => {
                             if (!isDragging) return;
@@ -1240,10 +1294,19 @@
                             );
                             document.removeEventListener("mouseup", onHeaderUp);
                             host.style.cursor = "move";
+
+                            host.style.borderRadius = baseRadius;
+
+                            if (!ctre.settings.window) ctre.settings.window = {};
+                            ctre.settings.window.left = host.style.left;
+                            ctre.settings.window.top = host.style.top;
+                            ctre.saveSettings();
                         };
                         dragTarget.addEventListener("mousedown", (e) => {
                             if (e.target.closest(".topButton")) return;
                             isDragging = true;
+                            isSnapped = { top: false, right: false, bottom: false, left: false };
+                            baseRadius = getComputedStyle(host).borderRadius;
                             host.style.cursor = "grabbing";
                             const rect = host.getBoundingClientRect();
                             offsetX = e.clientX - rect.left;
@@ -1314,6 +1377,13 @@
                     ffWarn.style.display = ctre.showPermissionsWarning
                         ? "block"
                         : "none";
+            }
+
+            if (ctre.settings.window?.left && ctre.settings.window?.top) {
+                ctre.helpWindow.style.left = ctre.settings.window.left;
+                ctre.helpWindow.style.top = ctre.settings.window.top;
+                ctre.helpWindow.style.bottom = "auto";
+                ctre.helpWindow.style.right = "auto";
             }
 
             document.removeEventListener(
