@@ -747,10 +747,8 @@
             if (!document.head) return;
             let cssLines = [
                 `
-				  #ctre_wnd { display: block; position: fixed; bottom: 0; right: 10px; background: #fff; color: #000; box-shadow: 0px 0px 40px rgba(0,0,0,0.15); border-radius: 3px 3px 0 0; z-index: ${ctre.maxZIndex}; font-family: sans-serif; font-size: 13px; }
-				  @media (prefers-color-scheme: dark) {
-					  #ctre_wnd { background: #222; color: #eee; box-shadow: 0px 0px 40px rgba(255,255,255,0.15); }
-				  }`,
+				  #ctre_wnd { display: block; position: fixed; bottom: 10px; right: 10px; background: transparent; z-index: ${ctre.maxZIndex}; }
+				  `,
             ];
 
             for (let i = 0; i < ctre.hiddenElements.length; i++) {
@@ -1124,6 +1122,128 @@
             if (mainWin) mainWin.style.removeProperty("display");
         },
 
+        initializeDragHandler: function (host) {
+            const dragTarget = ctre.$(".header");
+            if (dragTarget) {
+                dragTarget.style.cursor = "move";
+
+                const mainWindow = ctre.$('.mainWindow');
+                if (!mainWindow) {
+                    console.error("CTRE: mainWindow element not found for dragging.");
+                    return;
+                }
+
+                let isDragging = false,
+                    offsetX = 0,
+                    offsetY = 0;
+                let isSnapped = { top: false, right: false, bottom: false, left: false };
+                const SNAP_DISTANCE = 20;
+                const SNAP_FORCE = 30;
+                let baseRadius = '8px';
+
+                const onHeaderMove = (e) => {
+                    if (!isDragging) return;
+
+                    let newX = e.clientX - offsetX;
+                    let newY = e.clientY - offsetY;
+
+                    const rect = host.getBoundingClientRect();
+                    const winWidth = window.innerWidth;
+                    const winHeight = window.innerHeight;
+
+                    // Left edge
+                    if (isSnapped.left) {
+                        if (newX > SNAP_FORCE) {
+                            isSnapped.left = false;
+                        } else {
+                            newX = 0;
+                        }
+                    } else if (newX < SNAP_DISTANCE) {
+                        isSnapped.left = true;
+                        newX = 0;
+                    }
+
+                    // Right edge
+                    if (isSnapped.right) {
+                        if (newX + rect.width < winWidth - SNAP_FORCE) {
+                            isSnapped.right = false;
+                        } else {
+                            newX = winWidth - rect.width;
+                        }
+                    } else if (newX + rect.width > winWidth - SNAP_DISTANCE) {
+                        isSnapped.right = true;
+                        newX = winWidth - rect.width;
+                    }
+
+                    // Top edge
+                    if (isSnapped.top) {
+                        if (newY > SNAP_FORCE) {
+                            isSnapped.top = false;
+                        } else {
+                            newY = 0;
+                        }
+                    } else if (newY < SNAP_DISTANCE) {
+                        isSnapped.top = true;
+                        newY = 0;
+                    }
+
+                    // Bottom edge
+                    if (isSnapped.bottom) {
+                        if (newY + rect.height < winHeight - SNAP_FORCE) {
+                            isSnapped.bottom = false;
+                        } else {
+                            newY = winHeight - rect.height;
+                        }
+                    } else if (newY + rect.height > winHeight - SNAP_DISTANCE) {
+                        isSnapped.bottom = true;
+                        newY = winHeight - rect.height;
+                    }
+
+                    host.style.left = newX + "px";
+                    host.style.top = newY + "px";
+
+                    mainWindow.style.borderTopLeftRadius = (isSnapped.top || isSnapped.left) ? '0px' : baseRadius;
+                    mainWindow.style.borderTopRightRadius = (isSnapped.top || isSnapped.right) ? '0px' : baseRadius;
+                    mainWindow.style.borderBottomLeftRadius = (isSnapped.bottom || isSnapped.left) ? '0px' : baseRadius;
+                    mainWindow.style.borderBottomRightRadius = (isSnapped.bottom || isSnapped.right) ? '0px' : baseRadius;
+                };
+                const onHeaderUp = () => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    document.removeEventListener( "mousemove", onHeaderMove );
+                    document.removeEventListener("mouseup", onHeaderUp);
+                    host.style.cursor = "move";
+
+                    mainWindow.style.borderRadius = baseRadius;
+
+                    if (!ctre.settings.window) ctre.settings.window = {};
+                    ctre.settings.window.left = host.style.left;
+                    ctre.settings.window.top = host.style.top;
+                    ctre.saveSettings();
+                };
+                dragTarget.addEventListener("mousedown", (e) => {
+                    if (e.target.closest(".topButton")) return;
+                    isDragging = true;
+                    isSnapped = { top: false, right: false, bottom: false, left: false };
+                    baseRadius = getComputedStyle(mainWindow).borderRadius;
+                    host.style.cursor = "grabbing";
+                    const rect = host.getBoundingClientRect();
+                    offsetX = e.clientX - rect.left;
+                    offsetY = e.clientY - rect.top;
+                    host.style.position = "fixed";
+                    host.style.bottom = "auto";
+                    host.style.right = "auto";
+                    document.addEventListener( "mousemove", onHeaderMove );
+                    document.addEventListener("mouseup", onHeaderUp);
+                    e.preventDefault();
+                });
+            } else {
+                console.warn(
+                    "CTRE UI: Drag target (.header) not found."
+                );
+            }
+        },
+
         activate: function () {
             if (ctre.targetingMode) return;
 
@@ -1206,126 +1326,7 @@
                         e.preventDefault();
                     });
 
-                    const dragTarget = ctre.$(".header");
-                    if (dragTarget) {
-                        dragTarget.style.cursor = "move";
-                        const host = shadowElm;
-                        let isDragging = false,
-                            offsetX = 0,
-                            offsetY = 0;
-
-                        let isSnapped = { top: false, right: false, bottom: false, left: false };
-                        const SNAP_DISTANCE = 20;
-                        const SNAP_FORCE = 30;
-                        let baseRadius = '3px';
-
-                        const onHeaderMove = (e) => {
-                            if (!isDragging) return;
-
-                            let newX = e.clientX - offsetX;
-                            let newY = e.clientY - offsetY;
-
-                            const rect = host.getBoundingClientRect();
-                            const winWidth = window.innerWidth;
-                            const winHeight = window.innerHeight;
-
-                            // Left edge
-                            if (isSnapped.left) {
-                                if (newX > SNAP_FORCE) {
-                                    isSnapped.left = false;
-                                } else {
-                                    newX = 0;
-                                }
-                            } else if (newX < SNAP_DISTANCE) {
-                                isSnapped.left = true;
-                                newX = 0;
-                            }
-
-                            // Right edge
-                            if (isSnapped.right) {
-                                if (newX + rect.width < winWidth - SNAP_FORCE) {
-                                    isSnapped.right = false;
-                                } else {
-                                    newX = winWidth - rect.width;
-                                }
-                            } else if (newX + rect.width > winWidth - SNAP_DISTANCE) {
-                                isSnapped.right = true;
-                                newX = winWidth - rect.width;
-                            }
-
-                            // Top edge
-                            if (isSnapped.top) {
-                                if (newY > SNAP_FORCE) {
-                                    isSnapped.top = false;
-                                } else {
-                                    newY = 0;
-                                }
-                            } else if (newY < SNAP_DISTANCE) {
-                                isSnapped.top = true;
-                                newY = 0;
-                            }
-
-                            // Bottom edge
-                            if (isSnapped.bottom) {
-                                if (newY + rect.height < winHeight - SNAP_FORCE) {
-                                    isSnapped.bottom = false;
-                                } else {
-                                    newY = winHeight - rect.height;
-                                }
-                            } else if (newY + rect.height > winHeight - SNAP_DISTANCE) {
-                                isSnapped.bottom = true;
-                                newY = winHeight - rect.height;
-                            }
-
-                            host.style.left = newX + "px";
-                            host.style.top = newY + "px";
-
-                            host.style.borderTopLeftRadius = (isSnapped.top || isSnapped.left) ? '0px' : baseRadius;
-                            host.style.borderTopRightRadius = (isSnapped.top || isSnapped.right) ? '0px' : baseRadius;
-                            host.style.borderBottomLeftRadius = (isSnapped.bottom || isSnapped.left) ? '0px' : baseRadius;
-                            host.style.borderBottomRightRadius = (isSnapped.bottom || isSnapped.right) ? '0px' : baseRadius;
-                        };
-                        const onHeaderUp = () => {
-                            if (!isDragging) return;
-                            isDragging = false;
-                            document.removeEventListener(
-                                "mousemove",
-                                onHeaderMove
-                            );
-                            document.removeEventListener("mouseup", onHeaderUp);
-                            host.style.cursor = "move";
-
-                            host.style.borderRadius = baseRadius;
-
-                            if (!ctre.settings.window) ctre.settings.window = {};
-                            ctre.settings.window.left = host.style.left;
-                            ctre.settings.window.top = host.style.top;
-                            ctre.saveSettings();
-                        };
-                        dragTarget.addEventListener("mousedown", (e) => {
-                            if (e.target.closest(".topButton")) return;
-                            isDragging = true;
-                            isSnapped = { top: false, right: false, bottom: false, left: false };
-                            baseRadius = getComputedStyle(host).borderRadius;
-                            host.style.cursor = "grabbing";
-                            const rect = host.getBoundingClientRect();
-                            offsetX = e.clientX - rect.left;
-                            offsetY = e.clientY - rect.top;
-                            host.style.position = "fixed";
-                            host.style.bottom = "auto";
-                            host.style.right = "auto";
-                            document.addEventListener(
-                                "mousemove",
-                                onHeaderMove
-                            );
-                            document.addEventListener("mouseup", onHeaderUp);
-                            e.preventDefault();
-                        });
-                    } else {
-                        console.warn(
-                            "CTRE UI: Drag target (.header) not found."
-                        );
-                    }
+                    ctre.initializeDragHandler(shadowElm);
 
                     ctre.updateElementList();
                     ctre.$("#ctre_current_elm").textContent =
