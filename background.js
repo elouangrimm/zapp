@@ -542,7 +542,7 @@ function handleMessage(msg, sender, sendResponse) {
         case "get_hotkey":
             chrome.commands.getAll((cmds) => {
                 sendResponse(
-                    cmds?.find((c) => c.name === "_execute_action")?.shortcut ||
+                    cmds?.find((c) => c.name === "toggle-zapp")?.shortcut ||
                         "No key set"
                 );
             });
@@ -639,6 +639,17 @@ function handleMessage(msg, sender, sendResponse) {
 }
 
 chrome.action.onClicked.addListener(handleActionClick);
+
+chrome.commands.onCommand.addListener((command) => {
+    if (command === "toggle-zapp") {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs.length > 0) {
+                handleActionClick(tabs[0]);
+            }
+        });
+    }
+});
+
 chrome.runtime.onMessage.addListener(handleMessage);
 chrome.tabs.onActivated.addListener((activeInfo) => {
     checkTabStatus(activeInfo.tabId);

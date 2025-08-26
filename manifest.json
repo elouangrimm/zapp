@@ -24,7 +24,7 @@
         "default_title": "Click to remove element"
     },
     "commands": {
-        "_execute_action": {
+        "toggle-zapp": {
             "suggested_key": {
                 "default": "Ctrl+Shift+X",
                 "mac": "Command+Shift+X"
