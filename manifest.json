@@ -11,8 +11,7 @@
     "permissions": [
         "scripting",
         "tabs",
-        "storage",
-        "commands"
+        "storage"
     ],
     "host_permissions": [
         "*://*/*"
