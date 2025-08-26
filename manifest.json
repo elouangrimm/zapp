@@ -18,7 +18,7 @@
         "*://*/*"
     ],
     "background": {
-        "service_worker": "background.js"
+        "scripts": ["background.js"]
     },
     "action": {
         "default_icon": "./icons/action_inactive.png",
@@ -43,5 +43,11 @@
             ]
         }
     ],
-    "incognito": "spanning"
+    "incognito": "spanning",
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "zapp@example.com",
+            "strict_min_version": "109.0"
+        }
+    }
 }
