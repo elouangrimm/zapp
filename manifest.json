@@ -26,8 +26,8 @@
     "commands": {
         "toggle-zapp": {
             "suggested_key": {
-                "default": "Ctrl+Shift+Q",
-                "mac": "Command+Shift+Q"
+                "default": "Ctrl+Q",
+                "mac": "Command+Q"
             },
             "description": "Toggle Zapp Element Remover"
         }
