@@ -520,7 +520,7 @@
             const currentElmDiv = ctre.$("#ctre_current_elm");
             if (currentElmDiv) {
                 currentElmDiv.textContent =
-                    "Use the mouse to select an element to remove.";
+                    "Click on any element to remove it";
             }
         },
 
@@ -1330,7 +1330,7 @@
 
                     ctre.updateElementList();
                     ctre.$("#ctre_current_elm").textContent =
-                        "Use the mouse to select an element to remove.";
+                        "Click on any element to remove it";
                     shadowElm.style.visibility = "visible";
                     setTimeout(() => {
                         ctre.$(".header__logo")?.classList.add(
@@ -1372,7 +1372,7 @@
                 ctre.helpWindow.classList.add("visible");
                 ctre.updateElementList();
                 ctre.$("#ctre_current_elm").textContent =
-                    "Use the mouse to select an element to remove.";
+                    "Click on any element to remove it";
                 const ffWarn = ctre.$(".ffWarning");
                 if (ffWarn)
                     ffWarn.style.display = ctre.showPermissionsWarning
