@@ -383,6 +383,7 @@ hr {
 
 	overflow-y: auto;
 	overscroll-behavior: contain;
+	scrollbar-width: none;
 }
 
 #ctre_elm_list.hasContent {
