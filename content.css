@@ -213,15 +213,7 @@ hr {
 }
 
 .header__version {
-	font-size: 12px;
-	color: var(--md-sys-color-on-surface-variant);
-
-	margin-right: auto;
-
-	white-space: nowrap;
-
-	flex-shrink: 0;
-
+	display: none;
 }
 
 .header__logo_small {
@@ -345,13 +337,14 @@ hr {
 	border: 1px solid var(--md-sys-color-outline-variant);
 	border-radius: var(--ctre-border-radius-md);
 
-	padding: 8px 12px;
+	padding: 12px 16px;
 	margin: 0 0 8px 0;
 	max-height: 60px;
 
-	overflow: auto;
+	overflow: hidden;
 	line-height: 1.4;
-	white-space: normal;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 	display: block;
 }
 

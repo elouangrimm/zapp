@@ -21,7 +21,7 @@
     },
     "action": {
         "default_icon": "./icons/action_inactive.png",
-        "default_title": "Zapp"
+        "default_title": "Click to remove element"
     },
     "commands": {
         "toggle-zapp": {

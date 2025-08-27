@@ -822,7 +822,7 @@
             let lines = [];
             if (ctre.hiddenElements.length > 0) {
                 lines.push(
-                    '<table class="ct_element_table"><thead><tr class="ct_heading"><th>Removed Element</th><th>Remember?</th><th>Actions</th></tr></thead><tbody>'
+                    '<table class="ct_element_table"><thead><tr class="ct_heading"><th>Removed Element</th><th>Remember?</th><th>Remove</th></tr></thead><tbody>'
                 );
 
                 for (let i = 0; i < ctre.hiddenElements.length; i++) {
