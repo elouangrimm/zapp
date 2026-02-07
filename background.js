@@ -1,6 +1,7 @@
 /**
- * Click To Remove Element v3.1.5
- * © 2012-2023 Matúš Koprda - blade.sk, except for 3rd party libraries, where noted.
+ * Zapp v3.1.5
+ * By elouan.xyz, based on a project by blade.sk
+ * Third party libraries where noted.
  */
 
 // idb-keyval@6.2.1 - https://github.com/jakearchibald/idb-keyval/blob/main/LICENCE

@@ -1,5 +1,5 @@
-# zapp
+# Zapp
 
-A Chrome extension to remove deleted elements, in a stuningly half finished Material You theme.
+A Chrome extension to remove annoying elements from webpages.
 
-Forked from Click To Remove Element.
+By elouan.xyz, based on a project by blade.sk.

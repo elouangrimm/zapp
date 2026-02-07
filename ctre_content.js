@@ -1,6 +1,7 @@
 /**
- * Click To Remove Element v3.1.5
- * © 2012-2023 Matúš Koprda - blade.sk, except for 3rd party libraries, where noted.
+ * Zapp v3.1.5
+ * By elouan.xyz, based on a project by blade.sk
+ * Third party libraries where noted.
  */
 
 // @medv/finder@3.1.1 + priority mod - https://github.com/antonmedv/finder/blob/master/LICENSE
@@ -499,7 +500,7 @@ const ctre = {
 			<link rel="stylesheet" href="${chrome.runtime.getURL('content.css')}">
 			<div class="mainWindow">
 				<div class="header">
-					<span class="header__logo">Click To Remove Element
+					<span class="header__logo">Zapp
 						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="-300 -300 600 600">
 						<circle r="50"/>
 						<path d="M75,0 A 75,75 0 0,0 37.5,-64.952 L 125,-216.506 A 250,250 0 0,1 250,0 z" id="bld"/>
@@ -523,65 +524,14 @@ const ctre = {
 
 				${ctre.showPermissionsWarning ? '<div class="ffWarning"><p>⚠ Your browser requires you to approve the website access permission <b>manually</b>. CTRE needs this permission in order to remove elements you chose to hide permanently.</p><p>You should be asked for this permission the next time you activate the extension.</p></div>' : ''}
 
-				<div class="settingsRow">
-					${navigator.userAgent.match(/Gecko\//)
-						? '<div class="activationKeys" title="You can change this in Settings &gt; Extensions">'
-						: '<div class="activationKeys activationKeys_changeable" title="Click to change">'
-					}
-						Activation hotkey not set
-					</div>
-					<div>
-						<span class="key">Q</span>/<span class="key">W</span>: move up or down one level
-					</div>
-				</div>
-				<div class="settingsRow">
-					<label>
-						Remember by default: <span id="ctre_opt_remember">?</span>
-					</label>
-					<div>
-						<span class="key">SPACE</span>: remove element (when unable to click)
-					</div>
-				</div>
-				<div id="ctre_current_elm">Use the mouse to select an element to remove.</div>
-				<div id="ctre_elm_list"></div>
-
-				<div class="footer">
-					Made by <a href="https://blade.sk/?utm_source=ctre" target="_blank" rel="nofollow">blade.sk</a>.
-					If you like and use CTRE, please consider <a href="https://www.paypal.com/donate/?business=NUVLGGXDAXDTJ&no_recurring=1&item_name=Click+To+Remove+Element+is+being+developed+in+my+spare+time+without+any+compensation.+Your+support+is+greatly+appreciated.&currency_code=EUR" target="_blank" rel="nofollow">
-						donating
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 72 312 366" height="12" style="vertical-align: -12%;"><path fill="#002c8a" d="M377 184.8L180.7 399h-72c-5 0-9-5-8-10l48-304c1-7 7-12 14-12h122c84 3 107 46 92 112z"/><path fill="#009be1" d="M380.2 165c30 16 37 46 27 86-13 59-52 84-109 85l-16 1c-6 0-10 4-11 10l-13 79c-1 7-7 12-14 12h-60c-5 0-9-5-8-10l22-143c1-5 182-120 182-120z"/><path fill="#001f6b" d="M197 292l20-127a14 14 0 0 1 13-11h96c23 0 40 4 54 11-5 44-26 115-128 117h-44c-5 0-10 4-11 10z"/></svg>
-					</a>.
-					<br/>
-					My other extensions: <a href="https://keyboard.cool/?utm_source=ctre" target="_blank" rel="nofollow">
-
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" height="16" style="vertical-align: -20%; opacity: 0.5;"><path fill="#FFCC4D" d="M36 18c0 9.941-8.059 18-18 18S0 27.941 0 18 8.059 0 18 0s18 8.059 18 18"/><path fill-rule="evenodd" clip-rule="evenodd" fill="#292F33" d="M1.24 11.018c.24.239 1.438.957 1.677 1.675.24.717.72 4.784 2.158 5.981 1.483 1.232 7.077.774 8.148.24 2.397-1.195 2.691-4.531 3.115-6.221.239-.957 1.677-.957 1.677-.957s1.438 0 1.678.956c.424 1.691.72 5.027 3.115 6.221 1.072.535 6.666.994 8.151-.238 1.436-1.197 1.915-5.264 2.155-5.982.238-.717 1.438-1.435 1.677-1.674.241-.239.241-1.196 0-1.436-.479-.478-6.134-.904-12.223-.239-1.215.133-1.677.478-4.554.478-2.875 0-3.339-.346-4.553-.478-6.085-.666-11.741-.24-12.221.238-.239.239-.239 1.197 0 1.436z"/><path fill="#664500" d="M27.335 23.629c-.178-.161-.444-.171-.635-.029-.039.029-3.922 2.9-8.7 2.9-4.766 0-8.662-2.871-8.7-2.9-.191-.142-.457-.13-.635.029-.177.16-.217.424-.094.628C8.7 24.472 11.788 29.5 18 29.5s9.301-5.028 9.429-5.243c.123-.205.084-.468-.094-.628z"/></svg>
-						keyboard.cool
-					</a> emoji/symbol keyboard.
-				</div>
-			</div>
-		`
+			<div id=\"ctre_current_elm\">Use the mouse to select an element to remove.</div>
+			<div id=\"ctre_elm_list\"></div>
+		</div>
+	`
 
 		ctre.$('link').addEventListener('load', () => {
 			// prevent "flash of unstyled content" in the shadow DOM
 			shadowElm.style.visibility = 'visible'
-		})
-
-		chrome.runtime.sendMessage({ action: 'get_hotkey' }, (hotkey) => {
-			if (!hotkey) return
-
-			let keys = hotkey.split(/\+/)
-			let elm = ctre.$('.activationKeys')
-			let html = [
-				...keys.map(key => `<span class="key">${key}</span>`),
-				' : toggle CTRE',
-			]
-
-			if (elm) elm.innerHTML = html.join('')
-		})
-		
-		ctre.$('.activationKeys_changeable')?.addEventListener('click', function (e) {
-			chrome.runtime.sendMessage({ action: 'goto_hotkey_settings' })
-			e.preventDefault()
 		})
 
 		ctre.$('.topButton_close').addEventListener('click', function (e) {
@@ -599,15 +549,7 @@ const ctre = {
 			e.preventDefault()
 		})
 
-		ctre.$('#ctre_opt_remember').addEventListener('click', function (e) {
-			ctre.settings.remember = !ctre.settings.remember
-			ctre.saveSettings()
-			ctre.updateSettingsUI()
-			e.preventDefault()
-		})
-
 		ctre.updateElementList()
-		ctre.updateSettingsUI()
 		
 		ctre.targetingMode = true
 		document.addEventListener('mouseover', ctre.handleMouseover, true)
@@ -751,6 +693,13 @@ class AdvOptionsDialog {
 
 			<div class="advOptions">
 				<div class="advOptions__row">
+					<label>
+						Remember by default: <span id="ctre_opt_remember">?</span>
+					</label>
+					<p class="advOptions__rowHelp">When enabled, removed elements will be permanently hidden across sessions.</p>
+				</div>
+
+				<div class="advOptions__row">
 					<button class="advOptions__export">Export elements</button>
 					<p class="advOptions__rowHelp">Exports a list of all the permanently removed elements from all the websites to a JSON file.</p>
 				</div>
@@ -763,8 +712,17 @@ class AdvOptionsDialog {
 		`
 		shadowRoot.appendChild(this.elm)
 
+		ctre.updateSettingsUI()
+
 		this.elm.querySelector('.topButton_close').addEventListener('click', (e) => {
 			close()
+			e.preventDefault()
+		})
+
+		this.elm.querySelector('#ctre_opt_remember').addEventListener('click', (e) => {
+			ctre.settings.remember = !ctre.settings.remember
+			ctre.saveSettings()
+			ctre.updateSettingsUI()
 			e.preventDefault()
 		})
 
