@@ -2,7 +2,7 @@
 "update_url": "https://clients2.google.com/service/update2/crx",
 
 	"name": "Zapp",
-	"version": "3.1.5",
+	"version": "4.0.2",
 	"manifest_version": 3,
 	"description": "Remove annoying elements with a single click",
 	"icons": {

@@ -6,6 +6,7 @@
 	font: 12px/1.3 Helvetica, Arial, sans-serif;
 	color: #666;
 	min-height: 200px;
+	user-select: none;
 }
 
 input[type="checkbox"] {
@@ -22,6 +23,12 @@ hr {
 	box-sizing: border-box;
 	padding-top: 8px;
 	height: 32px;
+	user-select: none;
+	cursor: grab;
+}
+
+.header:active {
+	cursor: grabbing;
 }
 
 .header + hr {
@@ -32,10 +39,17 @@ hr {
 .header__logo {
 	font-size: 15px;
 	font-weight: bold;
+	user-select: none;
 }
 
 .header__logo_small {
 	display: none;
+	user-select: none;
+	cursor: grab;
+}
+
+.header__logo_small:active {
+	cursor: grabbing;
 }
 
 .header__logo svg {
@@ -65,18 +79,15 @@ hr {
 	cursor: pointer;
 	width: 32px;
 	line-height: 32px;
-	font-size: 14px;
+	font-size: 16px;
 	text-align: center;
 	transition: color 0.3s, background 0.3s;
+	user-select: none;
 }
 
 .topButton_settings {
 	background: #fff;
 	color: #999;
-}
-
-.topButton_settings svg {
-	vertical-align: -10%;
 }
 
 .topButton_settings:hover {
@@ -89,16 +100,13 @@ hr {
 	color: #0fb4d4;
 }
 
+.topButton_minimize .expand-icon {
+	display: none;
+}
+
 .topButton_minimize:hover {
 	background: #0fb4d4;
 	color: #fff;
-}
-
-.topButton_minimize i {
-	display: inline-block;
-	cursor: pointer;
-	transform: rotate(45deg);
-	transition: transform 0.5s;
 }
 
 .topButton_close {
@@ -256,6 +264,10 @@ hr {
 	font-size: 11px;
 }
 
+.ct_selector {
+	user-select: text;
+}
+
 #ctre_elm_list .ct_edit_selector {
 	font-family: sans-serif;
 	float: right;
@@ -336,9 +348,12 @@ hr {
 	display: none;
 }
 
-.mainWindow.minimized .topButton_minimize i {
-	display: inline-block;
-	transform: rotate(-135deg);
+.mainWindow.minimized .topButton_minimize .minimize-icon {
+	display: none;
+}
+
+.mainWindow.minimized .topButton_minimize .expand-icon {
+	display: inline;
 }
 
 .mainWindow.minimized .header {
@@ -416,6 +431,11 @@ hr {
 
 	.topButton_settings {
 		background: #000;
+		color: #999;
+	}
+
+	.topButton_settings:hover {
+		color: #fff;
 	}
 
 	.topButton_minimize {

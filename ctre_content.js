@@ -1,5 +1,5 @@
 /**
- * Zapp v3.1.5
+ * Zapp
  * By elouan.xyz, based on a project by blade.sk
  * Third party libraries where noted.
  */
@@ -7,7 +7,7 @@
 // @medv/finder@3.1.1 + priority mod - https://github.com/antonmedv/finder/blob/master/LICENSE
 const cssFinder=(()=>{let e,t;function n(n,a){if(n.nodeType!==Node.ELEMENT_NODE)throw Error("Can't generate CSS selector for non-element node type.");if("html"===n.tagName.toLowerCase())return"html";let o={root:document.body,idName:e=>!0,className:e=>!0,tagName:e=>!0,attr:(e,t)=>!1,seedMinLength:1,optimizedMinLength:2,threshold:1e3,maxNumberOfTries:1e4};t=l((e={...o,...a}).root,o);let u=r(n,"all",()=>r(n,"two",()=>r(n,"one",()=>r(n,"none"))));if(u){let f=v(E(u,n));return f.length>0&&(u=f[0]),i(u)}throw Error("Selector was not found.")}function l(e,t){return e.nodeType===Node.DOCUMENT_NODE?e:e===t.root?e.ownerDocument:e}function r(t,n,l){let r=null,i=[],o=t,u=0;for(;o;){let s=_(f(o))||_(...c(o))||_(...m(o))||_($(o))||[p()],h=d(o);if("all"==n)h&&(s=s.concat(s.filter(y).map(e=>g(e,h))));else if("two"==n)s=s.slice(0,1),h&&(s=s.concat(s.filter(y).map(e=>g(e,h))));else if("one"==n){let[N]=s=s.slice(0,1);h&&y(N)&&(s=[g(N,h)])}else"none"==n&&(s=[p()],h&&(s=[g(s[0],h)]));for(let w of s)w.level=u;if(i.push(s),i.length>=e.seedMinLength&&(r=a(i,l)))break;o=o.parentElement,u++}return(r||(r=a(i,l)),!r&&l)?l():r}function a(t,n){let l=v(w(t));if(l.length>e.threshold)return n?n():null;for(let r of l)if(u(r))return r;return null}function i(e){let t=e[0],n=t.name;for(let l=1;l<e.length;l++){let r=e[l].level||0;n=t.level===r-1?`${e[l].name} > ${n}`:`${e[l].name} ${n}`,t=e[l]}return n}function o(e){return e.map(e=>e.penalty).reduce((e,t)=>e+t,0)}function u(e){let n=i(e);switch(t.querySelectorAll(n).length){case 0:throw Error(`Can't select any node with this selector: ${n}`);case 1:return!0;default:return!1}}function f(t){let n=t.getAttribute("id");return n&&e.idName(n)?{name:"#"+CSS.escape(n),penalty:0}:null}function c(t){let n=Array.from(t.attributes).filter(t=>e.attr(t.name,t.value));return n.map(e=>({name:`[${CSS.escape(e.name)}="${CSS.escape(e.value)}"]`,penalty:.5}))}function s(e){let t=e.length;return e.match(/[\-_][a-z0-9]*[0-9]+[a-z0-9]*/i)&&(t+=50),e.match(/video|player|embed|^ad/i)&&(t-=75),t}function m(t){let n=Array.from(t.classList).filter(e.className);n.sort((e,t)=>s(e)-s(t));let l=n.map(e=>({name:"."+CSS.escape(e),penalty:1})),r=t.tagName.toLowerCase();return(r.match(/video|iframe/)&&l.unshift({name:r,penalty:1}),l.length)?h(l,2).map(e=>e.reduce((e,t)=>(e.name+=t.name,e.penalty+=t.penalty,e.level=t.level,e),{name:"",penalty:0})):l}function h(e,t=2){let n=function(e,t,l,r){if(0==e){l.length>0&&r.push(l);return}for(let a=0;a<t.length;a++)n(e-1,t.slice(a+1),l.concat([t[a]]),r)},l=[];for(let r=0;r<Math.min(e.length,t+1);r++)n(r,e,[],l);return e.length<t+1&&l.push(e),l}function $(t){let n=t.tagName.toLowerCase();return e.tagName(n)?{name:n,penalty:2}:null}function p(){return{name:"*",penalty:3}}function d(e){let t=e.parentNode;if(!t)return null;let n=t.firstChild;if(!n)return null;let l=0;for(;n&&(n.nodeType===Node.ELEMENT_NODE&&l++,n!==e);)n=n.nextSibling;return l}function g(e,t){return{name:e.name+`:nth-child(${t})`,penalty:e.penalty+10}}function y(e){return"html"!==e.name&&!e.name.startsWith("#")}function _(...e){let t=e.filter(N);return t.length>0?t:null}function N(e){return null!=e}function*w(e,t=[]){if(e.length>0)for(let n of e[0])yield*w(e.slice(1,e.length),t.concat(n));else yield t}function v(e){return[...e].sort((e,t)=>o(e)-o(t))}function*E(t,n,l={counter:0,visited:new Map}){if(t.length>2&&t.length>e.optimizedMinLength)for(let r=1;r<t.length-1;r++){if(l.counter>e.maxNumberOfTries)return;l.counter+=1;let a=[...t];a.splice(r,1);let o=i(a);if(l.visited.has(o))return;u(a)&&L(a,n)&&(yield a,l.visited.set(o,!0),yield*E(a,n,l))}}function L(e,n){return t.querySelector(i(e))===n}return n})();
 
-const VERSION = '3.1.5'
+let VERSION = chrome.runtime.getManifest().version
 
 const ctre = {
 	hoveredElement: null, // the element that is being hovered
@@ -24,6 +24,11 @@ const ctre = {
 	undoStack: [], // added selectors that can be undone using ctrl+z
 	
 	helpWindow: null,
+	windowPosition: null, // {x, y, snapped: 'none'|'top'|'bottom'|'left'|'right'}
+	dragging: false,
+	dragOffsetX: 0,
+	dragOffsetY: 0,
+	SNAP_THRESHOLD: 20, // pixels from edge to trigger snap
 
 	$: function(query) {
 		if (!this.helpWindow) return null
@@ -81,16 +86,19 @@ const ctre = {
 
 		ctre.updateHighlighterPos()
 
-		ctre.$('#ctre_current_elm').innerHTML = ctre.getPathHTML(ctre.hoveredElement, ctre.transpose)
-		ctre.$('#ctre_current_elm .pathNode.active').scrollIntoView({ block: 'center' })
-		// ctre.$('#ctre_current_elm').scrollTop = 9999
+		if (ctre.$('#ctre_current_elm')) {
+			ctre.$('#ctre_current_elm').innerHTML = ctre.getPathHTML(ctre.hoveredElement, ctre.transpose)
+			ctre.$('#ctre_current_elm .pathNode.active')?.scrollIntoView({ block: 'center' })
+		}
 	},
 
 	unhighlightElement: function() {
 		document.querySelector('#ctre_highlighter')?.remove()
 		ctre.markedElement = null
 		ctre.hoveredElement = null
-		ctre.$('#ctre_current_elm').innerHTML = 'Use the mouse to select an element to remove.'
+		if (ctre.$('#ctre_current_elm')) {
+			ctre.$('#ctre_current_elm').innerHTML = 'Use the mouse to select an element to remove.'
+		}
 	},
 
 	updateHighlighterPos: function() {
@@ -113,9 +121,7 @@ const ctre = {
 
 		if (ctre.activeDialog) return
 
-		if (ctre.isChildOfCTREWindow(e.target)) {
-			ctre.unhighlightElement()
-			ctre.preventHighlightingUntil = +new Date() + 100
+	if (ctre.isEventInCTREWindow(e)) {
 			return
 		}
 		
@@ -127,6 +133,10 @@ const ctre = {
 	},
 
 	isChildOfCTREWindow: function(elm) {
+		// Check if element is within the helpWindow or its shadow DOM
+		if (elm == ctre.helpWindow) return true
+		
+		// Check regular parent chain
 		for (var i = 0; i < 8; i++) {
 			if (elm == ctre.helpWindow) return true
 			elm = elm.parentNode
@@ -134,6 +144,13 @@ const ctre = {
 		}
 
 		return false
+	},
+	
+	isEventInCTREWindow: function(event) {
+		// For events, use composedPath to traverse shadow DOM boundaries
+		if (!event || !event.composedPath) return false
+		const path = event.composedPath()
+		return path.some(el => el === ctre.helpWindow || el === ctre.helpWindow?.shadowRoot)
 	},
 	
 	handleKeydown: function(e) {
@@ -147,12 +164,19 @@ const ctre = {
 				e.preventDefault()
 			}
 		} else {
+			// Allow Ctrl+R and Ctrl+Shift+R to work (page refresh)
+			if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+				return
+			}
+
 			if (e.code == 'Escape') {
 				ctre.deactivate()
 			} else if (e.code == 'Space') {
 				if (ctre.markedElement) ctre.hideTarget()
 			} else if (e.key == 'w') {
-				if (ctre.transpose > 0) ctre.transpose--
+				if (ctre.transpose > 0) {
+					ctre.transpose--
+				}
 				ctre.highlightElement()
 			} else if (e.key == 'q') {
 				ctre.transpose++
@@ -175,7 +199,7 @@ const ctre = {
 	
 	hideTarget: function(mouseEvt/* optional */) {
 		if (!ctre.markedElement) return
-		if (mouseEvt && ctre.isChildOfCTREWindow(mouseEvt.target)) return
+		if (mouseEvt && ctre.isEventInCTREWindow(mouseEvt)) return
 
 		let selector = ctre.getSelector(ctre.markedElement)
 		if (!selector) return
@@ -267,7 +291,7 @@ const ctre = {
 	},
 
 	preventEvent: function(e) {
-		if (ctre.isChildOfCTREWindow(e.target)) return
+		if (ctre.isEventInCTREWindow(e)) return
 
 		e.preventDefault()
 		e.stopPropagation()
@@ -275,17 +299,24 @@ const ctre = {
 	},
 	
 	updateCSS: function() {
+		let position = ''
+		if (ctre.windowPosition && ctre.windowPosition.x !== undefined && ctre.windowPosition.y !== undefined) {
+			position = `left: ${ctre.windowPosition.x}px; top: ${ctre.windowPosition.y}px;`
+		} else {
+			position = 'bottom: 0; right: 10px;'
+		}
+
 		let cssLines = [
 			`
 			#ctre_wnd {
-				position: fixed; bottom: 0; right: 10px;
-				background: #fff; box-shadow: 0px 0px 40px rgba(0,0,0,0.15);
-				border-radius: 3px 3px 0 0;
+				position: fixed; ${position}
+				background: #fff; box-shadow: 0px 0px 20px rgba(0,0,0,0.1);
+				border-radius: 3px;
 				z-index: ${ctre.maxZIndex};
 			}
 
 			@media (prefers-color-scheme: dark) {
-				#ctre_wnd { background: #000; box-shadow: 0px 0px 40px rgba(255,255,255,0.15); }
+				#ctre_wnd { background: #000; box-shadow: 0px 0px 20px rgba(255,255,255,0.08); }
 			}
 			`
 		]
@@ -473,6 +504,113 @@ const ctre = {
 		})
 	},
 
+	loadWindowPosition: function() {
+		try {
+			let stored = localStorage.getItem('ctre_window_position')
+			if (stored) {
+				ctre.windowPosition = JSON.parse(stored)
+			}
+		} catch (e) {
+			console.error('Failed to load window position:', e)
+		}
+	},
+
+	saveWindowPosition: function() {
+		try {
+			if (ctre.windowPosition) {
+				localStorage.setItem('ctre_window_position', JSON.stringify(ctre.windowPosition))
+			}
+		} catch (e) {
+			console.error('Failed to save window position:', e)
+		}
+	},
+
+	updateWindowPosition: function(x, y) {
+		if (!ctre.helpWindow) return
+
+		const winWidth = window.innerWidth
+		const winHeight = window.innerHeight
+		const rect = ctre.helpWindow.getBoundingClientRect()
+		const elmWidth = rect.width
+		const elmHeight = rect.height
+		const isMinimized = ctre.$('.mainWindow')?.classList.contains('minimized')
+
+		// Detect edge snapping
+		let snapped = 'none'
+		if (x <= ctre.SNAP_THRESHOLD) {
+			x = 0
+			snapped = 'left'
+		} else if (x + elmWidth >= winWidth - ctre.SNAP_THRESHOLD) {
+			x = winWidth - elmWidth
+			snapped = 'right'
+		}
+
+		if (y <= ctre.SNAP_THRESHOLD) {
+			y = 0
+			snapped = snapped === 'none' ? 'top' : snapped
+		} else if (y + elmHeight >= winHeight - ctre.SNAP_THRESHOLD) {
+			y = winHeight - elmHeight
+			snapped = snapped === 'none' ? 'bottom' : snapped
+		}
+
+		ctre.helpWindow.style.left = x + 'px'
+		ctre.helpWindow.style.top = y + 'px'
+		ctre.helpWindow.style.right = 'auto'
+		ctre.helpWindow.style.bottom = 'auto'
+
+		ctre.windowPosition = { x, y, snapped }
+		ctre.saveWindowPosition()
+	},
+
+	startDrag: function(e) {
+		if (e.button !== 0) return // only left click
+
+		// Get the composed path to check elements inside shadow DOM
+		const path = e.composedPath()
+		let target = path[0]
+		
+		// Check if clicking on a top button
+		if (path.some(el => el.classList && el.classList.contains('topButton'))) return
+
+		const isMinimized = ctre.$('.mainWindow')?.classList.contains('minimized')
+		
+		// Check if we're clicking on a draggable area
+		const isDraggable = isMinimized 
+			? path.some(el => el.classList && (el.classList.contains('header__logo') || el.classList.contains('header__logo_small')))
+			: path.some(el => el.classList && el.classList.contains('header'))
+
+		if (!isDraggable) return
+
+		e.preventDefault()
+		e.stopPropagation()
+		ctre.dragging = true
+
+		const rect = ctre.helpWindow.getBoundingClientRect()
+		ctre.dragOffsetX = e.clientX - rect.left
+		ctre.dragOffsetY = e.clientY - rect.top
+
+		document.body.style.userSelect = 'none'
+		ctre.helpWindow.style.cursor = 'grabbing'
+	},
+
+	handleDrag: function(e) {
+		if (!ctre.dragging) return
+
+		e.preventDefault()
+		const x = e.clientX - ctre.dragOffsetX
+		const y = e.clientY - ctre.dragOffsetY
+		ctre.updateWindowPosition(x, y)
+	},
+
+	endDrag: function(e) {
+		if (!ctre.dragging) return
+
+		e.preventDefault()
+		ctre.dragging = false
+		document.body.style.userSelect = ''
+		ctre.helpWindow.style.cursor = ''
+	},
+
 	activateDialog: function(cls) {
 		ctre.activeDialog = new cls(ctre.helpWindow.shadowRoot, ctre.deactivateDialog)
 		ctre.$('.mainWindow').style.display = 'none'
@@ -509,22 +647,19 @@ const ctre = {
 						</svg>
 					</span>
 					<span class="header__version">${VERSION}</span>
-					<span class="header__logo header__logo_small">CTRE</span>
+					<span class="header__logo header__logo_small">Zapp</span>
 				</div>
 				
 				<hr/>
 
 				<div class="topButtons">
-					<div class="topButton topButton_settings" title="Advanced options">
-						<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-					</div>
-					<div class="topButton topButton_minimize" title="Minimize"><i>➜</i></div>
-					<div class="topButton topButton_close" title="Close">✖</div>
-				</div>
+				<div class="topButton topButton_settings" title="Advanced options">⚙</div>
+				<div class="topButton topButton_minimize" title="Minimize"><span class="minimize-icon">▼</span><span class="expand-icon">▲</span></div>
+				<div class="topButton topButton_close" title="Close">×</div>
+			</div>
 
-				${ctre.showPermissionsWarning ? '<div class="ffWarning"><p>⚠ Your browser requires you to approve the website access permission <b>manually</b>. CTRE needs this permission in order to remove elements you chose to hide permanently.</p><p>You should be asked for this permission the next time you activate the extension.</p></div>' : ''}
+			<div id="ctre_current_elm">Use the mouse to select an element to remove.</div>
 
-			<div id=\"ctre_current_elm\">Use the mouse to select an element to remove.</div>
 			<div id=\"ctre_elm_list\"></div>
 		</div>
 	`
@@ -535,8 +670,9 @@ const ctre = {
 		})
 
 		ctre.$('.topButton_close').addEventListener('click', function (e) {
-			ctre.deactivate()
 			e.preventDefault()
+			e.stopPropagation()
+			ctre.deactivate()
 		})
 
 		ctre.$('.topButton_minimize').addEventListener('click', function (e) {
@@ -548,6 +684,19 @@ const ctre = {
 			ctre.activateDialog(AdvOptionsDialog)
 			e.preventDefault()
 		})
+
+		// Setup drag functionality
+		shadowElm.addEventListener('mousedown', ctre.startDrag)
+		document.addEventListener('mousemove', ctre.handleDrag)
+		document.addEventListener('mouseup', ctre.endDrag)
+
+		// Apply saved position after CSS loads
+		if (ctre.windowPosition && ctre.windowPosition.x !== undefined) {
+			shadowElm.style.left = ctre.windowPosition.x + 'px'
+			shadowElm.style.top = ctre.windowPosition.y + 'px'
+			shadowElm.style.right = 'auto'
+			shadowElm.style.bottom = 'auto'
+		}
 
 		ctre.updateElementList()
 		
@@ -573,6 +722,10 @@ const ctre = {
 		ctre.deactivateDialog()
 		
 		ctre.unhighlightElement()
+		
+		// Remove drag listeners
+		document.removeEventListener('mousemove', ctre.handleDrag)
+		document.removeEventListener('mouseup', ctre.endDrag)
 		
 		ctre.helpWindow.parentNode.removeChild(ctre.helpWindow)
 		
@@ -643,6 +796,7 @@ const ctre = {
 		chrome.runtime.onMessage.addListener(ctre.handleExtensionMessage)
 
 		ctre.loadSavedElements()
+		ctre.loadWindowPosition()
 	},
 	
 	destroy: function() {
@@ -688,7 +842,7 @@ class AdvOptionsDialog {
 			<hr/>
 
 			<div class="topButtons">
-				<div class="topButton topButton_close" title="Close">✖</div>
+				<div class="topButton topButton_close" title="Close">×</div>
 			</div>
 
 			<div class="advOptions">
@@ -738,7 +892,7 @@ class AdvOptionsDialog {
 					link.href = url
 					link.target = '_blank'
 					link.rel = 'noopener'
-					link.download = 'CTRE export ' + new Date().toLocaleString('sv-SE').replace(/[^0-9\- ]/g, '-') + '.json'
+					link.download = 'Zapp export ' + new Date().toLocaleString('sv-SE').replace(/[^0-9\- ]/g, '-') + '.json'
 					link.click()
 				})
 			e.preventDefault()
