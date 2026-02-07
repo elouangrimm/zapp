@@ -16,7 +16,7 @@ const ctre = {
 	targetingMode: false,
 	transpose: 0, // how far to travel up the line of ancestors
 	maxZIndex: 2147483647,
-	hiddenElements: [],
+	hiddenElements: [], // each element: { selector, permanent, displayName }
 	settings: {},
 	preventHighlightingUntil: 0, // block highlighting until this timestamp is passed - workaround for flashing, see below
 	activeDialog: null,
@@ -215,6 +215,7 @@ const ctre = {
 		ctre.hiddenElements.push({
 			selector,
 			permanent: !!ctre.settings.remember,
+			displayName: null, // will display selector if null
 		})
 
 		ctre.undoStack.push(selector)
@@ -367,8 +368,12 @@ const ctre = {
 			lines.push('<table><tr class="ct_heading"><td>Removed element</td><td>Remember?</td><td></td></tr>')
 
 			for (let elm of ctre.hiddenElements) {
+				const displayText = elm.displayName || elm.selector
 				lines.push(`<tr>
-					<td class="ct_selector"><a href="" class="ct_edit_selector">edit</a>${escapeHTML(elm.selector)}</td>
+					<td class="ct_selector">
+						<span class="ct_display_name" title="${escapeHTML(elm.selector)}">${escapeHTML(displayText)}</span>
+						<a href="" class="ct_edit_selector">edit</a>
+					</td>
 					<td><input type="checkbox"${elm.permanent ? ' checked' : ''}></td>
 					<td><span class="ct_preview">👁</span> <a href="" class="ct_delete">✖</a></td>
 				</tr>`)
@@ -446,6 +451,77 @@ const ctre = {
 			}
 		}
 
+		function onDisplayNameDblClick(e) {
+			let tr = closest(this, 'tr')
+			let hiddenElement = ctre.hiddenElements.find(elm => elm.selector == tr.selector)
+			if (!hiddenElement) return
+
+			const displayNameSpan = this
+			const currentText = hiddenElement.displayName || hiddenElement.selector
+			
+			// Create input element
+			const input = document.createElement('input')
+			input.type = 'text'
+			input.className = 'ct_display_name_input'
+			input.value = currentText
+			
+			let isSaving = false
+			
+			function saveDisplayName() {
+				if (isSaving) return
+				isSaving = true
+				
+				const newValue = input.value.trim()
+				
+				// Save the new display name
+				if (newValue && newValue !== hiddenElement.selector) {
+					hiddenElement.displayName = newValue
+				} else {
+					hiddenElement.displayName = null // Use selector as default
+				}
+				
+				ctre.updateSavedElements()
+				ctre.updateElementList()
+			}
+			
+			// Prevent mousedown from causing blur
+			input.addEventListener('mousedown', function(e) {
+				e.stopPropagation()
+			})
+			
+			input.addEventListener('click', function(e) {
+				e.stopPropagation()
+			})
+			
+			input.addEventListener('blur', function() {
+				// Delay slightly to allow other events to complete
+				setTimeout(saveDisplayName, 0)
+			})
+			
+			input.addEventListener('keydown', function(e) {
+				e.stopPropagation()
+				if (e.key === 'Enter') {
+					e.preventDefault()
+					input.blur()
+				} else if (e.key === 'Escape') {
+					e.preventDefault()
+					isSaving = true // Prevent save
+					ctre.updateElementList() // Cancel edit
+				}
+			})
+			
+			// Replace span with input
+			displayNameSpan.replaceWith(input)
+			
+			// Use setTimeout to ensure the input is in the DOM before focusing
+			setTimeout(function() {
+				input.focus()
+				input.select()
+			}, 0)
+			
+			e.stopPropagation()
+		}
+
 		let i = -1
 		for (let tr of ctre.$$('#ctre_elm_list table tr')) {
 			if (i < 0) { // skip heading
@@ -460,6 +536,7 @@ const ctre = {
 			tr.querySelector('.ct_preview').addEventListener('mouseenter', onPreviewHoverOn, false)
 			tr.querySelector('.ct_preview').addEventListener('mouseleave', onPreviewHoverOff, false)
 			tr.querySelector('a.ct_edit_selector').addEventListener('click', onEditSelector, false)
+			tr.querySelector('.ct_display_name').addEventListener('dblclick', onDisplayNameDblClick, false)
 
 			i++
 		}
