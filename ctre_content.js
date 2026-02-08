@@ -716,15 +716,11 @@ const ctre = {
 			<div class="mainWindow">
 				<div class="header">
 					<span class="header__logo">Zapp
-						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="-300 -300 600 600">
-						<circle r="50"/>
-						<path d="M75,0 A 75,75 0 0,0 37.5,-64.952 L 125,-216.506 A 250,250 0 0,1 250,0 z" id="bld"/>
-						<use xlink:href="#bld" transform="rotate(120)"/>
-						<use xlink:href="#bld" transform="rotate(240)"/>
-						</svg>
+						<img src="${chrome.runtime.getURL('icons/logo_app.png')}" width="16" height="16" style="vertical-align: -15%;">
 					</span>
 					<span class="header__version">${VERSION}</span>
-					<span class="header__logo header__logo_small">Zapp</span>
+					<span class="header__logo header__logo_small">Zapp
+					</span>
 				</div>
 				
 				<hr/>
@@ -787,10 +783,6 @@ const ctre = {
 		ctre.addOverlays()
 		
 		chrome.runtime.sendMessage({action: 'status', active: true})
-
-		setTimeout(function () {
-			ctre.$('.header__logo').classList.add('header__logo_anim')
-		}, 100)
 	},
 	
 	deactivate: function() {

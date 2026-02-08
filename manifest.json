@@ -37,7 +37,7 @@
 		"*://*/*"
 	],
 	"web_accessible_resources": [{
-		"resources": [ "content.css" ],
+		"resources": [ "content.css", "icons/logo_app.png" ],
 		"matches": [ "*://*/*" ]
 	}],
 	"incognito": "spanning"

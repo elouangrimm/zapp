@@ -52,17 +52,6 @@ hr {
 	cursor: grabbing;
 }
 
-.header__logo svg {
-	fill: #666;
-	vertical-align: -15%;
-	transform: rotate(-240deg);
-}
-
-.header__logo_anim svg {
-	transform: rotate(0deg);
-	transition: transform 1s;
-}
-
 .header__version {
 	color: #bbb;
 }
@@ -435,12 +424,6 @@ hr {
 }
 
 @media (prefers-reduced-motion) {
-	.header__logo svg,
-	.header__logo_anim svg {
-		transform: rotate(0deg);
-	}
-
-	.header__logo_anim svg,
 	.topButton,
 	.topButton_minimize i,
 	.footer a {
@@ -456,10 +439,6 @@ hr {
 
 	hr {
 		border-color: #333;
-	}
-
-	.header__logo svg {
-		fill: #ccc;
 	}
 
 	.header__version {
