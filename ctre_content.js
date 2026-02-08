@@ -726,9 +726,9 @@ const ctre = {
 				<hr/>
 
 				<div class="topButtons">
-				<div class="topButton topButton_settings" title="Advanced options"><span class="material-symbols-outlined">settings</span></div>
-				<div class="topButton topButton_minimize" title="Minimize"><span class="material-symbols-outlined minimize-icon">unfold_less</span><span class="material-symbols-outlined expand-icon">unfold_more</span></div>
-				<div class="topButton topButton_close" title="Close"><span class="material-symbols-outlined">close</span></div>
+				<div class="topButton topButton_settings" title="Advanced options"><span class="icon icon-settings" aria-hidden="true"></span></div>
+				<div class="topButton topButton_minimize" title="Minimize"><span class="icon icon-collapse-all minimize-icon" aria-hidden="true"></span><span class="icon icon-expand-all expand-icon" aria-hidden="true"></span></div>
+				<div class="topButton topButton_close" title="Close"><span class="icon icon-close" aria-hidden="true"></span></div>
 			</div>
 
 			<div id="ctre_current_elm">Use the mouse to select an element to remove.</div>
@@ -911,7 +911,7 @@ class AdvOptionsDialog {
 			<hr/>
 
 			<div class="topButtons">
-				<div class="topButton topButton_close" title="Close"><span class="material-symbols-outlined">close</span></div>
+				<div class="topButton topButton_close" title="Close"><span class="icon icon-close" aria-hidden="true"></span></div>
 			</div>
 
 			<div class="advOptions">
