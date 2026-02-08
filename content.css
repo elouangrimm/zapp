@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400;500&display=swap');
+
 .mainWindow,
 .dialog {
 	position: relative;
@@ -17,6 +19,21 @@ hr {
 	border: none;
 	border-top: solid 1px #eee;
 	margin: 10px -20px;
+}
+
+.material-symbols-outlined {
+	font-family: 'Material Symbols Outlined', sans-serif;
+	font-weight: 400;
+	font-style: normal;
+	font-size: 20px;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-transform: none;
+	letter-spacing: normal;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
 }
 
 .header {
@@ -64,9 +81,12 @@ hr {
 }
 
 .topButton {
-	display: block;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	cursor: pointer;
 	width: 32px;
+	height: 32px;
 	line-height: 32px;
 	font-size: 16px;
 	text-align: center;
@@ -425,7 +445,7 @@ hr {
 
 @media (prefers-reduced-motion) {
 	.topButton,
-	.topButton_minimize i,
+	.material-symbols-outlined,
 	.footer a {
 		transition: none;
 	}
